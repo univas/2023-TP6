@@ -1,0 +1,1 @@
+Calcular a classificação do campeonato depois de três rodadas.
