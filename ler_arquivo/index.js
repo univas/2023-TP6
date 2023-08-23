@@ -1,4 +1,3 @@
-const { rejects } = require('assert')
 const fs = require('fs')
 
 const lerArquivo = (nome) => {
@@ -13,15 +12,35 @@ const lerArquivo = (nome) => {
     })
 }
 
-lerArquivo('./nomes.txt').then(arquivo => {
-    arquivo.forEach((nome, index) => {
-        let ordem = new String(index+1)
-        ordem = ordem.padStart(2, '0')
-        console.log(`Nome da pessoa ${ordem}: ${nome}`)
-    })
-}).catch(err => {
-    console.log("Impossível ler o arquivo.")
-})
+async function executar(){
+    try{
+        const resultado = await lerArquivo('./nomes.txt')
+        resultado.forEach((nome, index) => {
+            let ordem = new String(index+1)
+            ordem = ordem.padStart(2, '0')
+            let complemento = ""
+            if(nome.startsWith("M")){
+                complemento = "##"
+            }
+            console.log(`Nome da pessoa ${ordem}: ${complemento} ${nome} ${complemento}`)
+        })
+    }catch(err){
+        console.log("Impossível ler o arquivo.")
+    }
+}
+
+executar()
+
+// lerArquivo('./nomes.txt')
+// .then(arquivo => {
+//     arquivo.forEach((nome, index) => {
+//         let ordem = new String(index+1)
+//         ordem = ordem.padStart(2, '0')
+//         console.log(`Nome da pessoa ${ordem}: ${nome}`)
+//     })
+// }).catch(err => {
+//     console.log("Impossível ler o arquivo.")
+// })
 
 
 // fs.readFile('./nomes.txt', {encoding: 'utf8'},(err, arquivo) => {
