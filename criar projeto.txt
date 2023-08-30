@@ -1,0 +1,13 @@
+1. Criar pasta para o projeto
+
+2. Acessar pasta pelo terminal (cd nome_da_pasta)
+
+3. npm init -y // criar o projeto node
+
+4. yarn add express ejs // instalar as dependências do projeto
+
+5. yarn add nodemon --dev // instalar o nodemon como desenvolvimento
+
+6. Criar o script start dentro do package.json como "nodemon index.js"
+
+7. npm start // para executar o projeto
