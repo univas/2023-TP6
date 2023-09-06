@@ -1,0 +1,13 @@
+Criar uma tela de login em /login
+Criar uma rota post em /login que recebe os dados e verifica se estão corretos.
+Se estiver correto, devolve a pagina de sucesso.
+Se estiver errado, devolve a pagina de login com mensagem de erro.
+<% if(erro){ %>
+	Falha no login
+<% } %>
+node_modules // gera automatico
+views // precisa criar esta pasta
+	login.ejs // formulario de login com tratativa do erro
+	sucesso.ejs // apenas uma mensagem de sucesso
+index.js // importar express, instanciar app, definir rotas
+package.json // gerado automaticamente com "npm init -y"
