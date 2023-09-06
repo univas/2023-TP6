@@ -4,9 +4,9 @@
 
 3. npm init -y // criar o projeto node
 
-4. yarn add express ejs // instalar as dependências do projeto
+4. yarn add express ejs // instalar as dependências do projeto (npm install express ejs)
 
-5. yarn add nodemon --dev // instalar o nodemon como desenvolvimento
+5. yarn add nodemon --D // instalar o nodemon como desenvolvimento (npm install --save-dev nodemon)
 
 6. Criar o script start dentro do package.json como "nodemon index.js"
 
