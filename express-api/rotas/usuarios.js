@@ -1,9 +1,11 @@
 const express = require('express')
+const { buscarUsuario, usuarios } = require('../repositorios/usuarios')
 const router = express.Router()
-const validacaoUsuario = require('../validacoes/usuarios')
+
+const usuarios_repositorio = usuarios()
 
 // Criando função para criar as rotas e retornar o router
-const rotas_usuarios = (usuarios_repositorio) => {
+const rotas_usuarios = () => {
     // rota de obter usuarios
     router.get("/usuarios", (req, res) => {
         const {nome, login, email} = req.query
@@ -38,6 +40,7 @@ const rotas_usuarios = (usuarios_repositorio) => {
             res.send(usuario)
         }catch(error){
             // Capturei o erro enviado
+            console.log(error.message)
             const conteudo_erro = JSON.parse(error.message)
 
             // Retornando os erros e status correto
@@ -48,27 +51,7 @@ const rotas_usuarios = (usuarios_repositorio) => {
     // rota para criar um usuário novo
     router.post("/usuarios", (req, res) => {
         try{
-
-            // buscar o último id criado
-            const ultimo_id = usuarios_db.reduce((anterior, proximo) => {
-                if(proximo.id > anterior){
-                    return proximo.id
-                }else{
-                    return anterior
-                }
-            }, 0)
-
-            // criar o novo usuário
-            const usuario_novo = req.body
-
-            validacaoUsuario(usuario_novo)
-
-            // inserir o novo id ao usuário criado
-            usuario_novo.id = ultimo_id + 1
-
-            // inserir o usuário no array
-            usuarios_db.push(usuario_novo)
-
+            const usuario_novo = usuarios_repositorio.create(req.body)
             // enviar a resposta
             res.send(usuario_novo)
         }catch(error){
@@ -85,26 +68,9 @@ const rotas_usuarios = (usuarios_repositorio) => {
         try{
             // obtendo o parametro id enviado por meio de uma desestruturação
             const {id} = req.params
-
-            // busca o usuário pelo ID
-            const usuarios_filtrados = usuarios_db.filter(u =>{
-                return u.id == id
-            })
-
-            // Verifica se o usuário existe
-            if(usuarios_filtrados.length == 0){
-                // Se não existir devolve erro 404
-                return res.status(404).send()
-            }
-            const dados_novos = req.body
-            validacaoUsuario(dados_novos)
-
-            // atualiza os dados do usuário buscado
-            const usuario = usuarios_filtrados[0]
-            usuario.email = req.body.email
-            usuario.login = req.body.login
-            usuario.nome = req.body.nome
-            usuario.senha = req.body.senha
+            
+            // Solicitando ao repositorio para atualizar os dados do usuario
+            const usuario = usuarios_repositorio.update(req.body, id)
 
             // retorna com sucesso
             return res.send(usuario)
@@ -123,23 +89,15 @@ const rotas_usuarios = (usuarios_repositorio) => {
         // obtendo o parametro id enviado por meio de uma desestruturação
         const {id} = req.params
 
-        // busca o usuário pelo ID
-        const usuarios_filtrados = usuarios_db.filter(u =>{
-            return u.id == id
-        })
-
-        // Verifica se o usuário existe
-        if(usuarios_filtrados.length == 0){
-            // Se não existir devolve erro 404
-            return res.status(404).send()
-        }
+        const usuario_cadastrado = buscarUsuario(id)
 
         // atualiza os dados do usuário buscado
-        const usuario = usuarios_filtrados[0]
-        usuario.email = req.body.email ?? usuario.email
-        usuario.login = req.body.login ?? usuario.login
-        usuario.nome = req.body.nome ?? usuario.nome
-        usuario.senha = req.body.senha ?? usuario.senha
+        usuario_cadastrado.email = req.body.email ?? usuario_cadastrado.email
+        usuario_cadastrado.login = req.body.login ?? usuario_cadastrado.login
+        usuario_cadastrado.nome = req.body.nome ?? usuario_cadastrado.nome
+        usuario_cadastrado.senha = req.body.senha ?? usuario_cadastrado.senha
+
+        const usuario = usuarios_repositorio.update(usuario_cadastrado, id)
 
         // retorna com sucesso
         return res.send(usuario)
@@ -150,17 +108,8 @@ const rotas_usuarios = (usuarios_repositorio) => {
         // obtendo parametro id enviado por meio de desestruturação
         const {id} = req.params
 
-        // obtendo o usuário pelo ID
-        const usuarios_filtrados = usuarios_db.filter(u => u.id == id)
-
-        // verificando se o usuário existe
-        if(usuarios_filtrados.length == 0){
-            // se não existir, devolve um erro 404 pro cliente.
-            return res.status(404).send()
-        }
-
-        // cria um novo array sem o usuário que deve ser excluído
-        usuarios_db = usuarios_db.filter(u => u.id != id)
+        // Executando a exclusão do usuário
+        usuarios_repositorio.destroy(id)
 
         return res.status(200).send()
     })

@@ -15,7 +15,7 @@ app.use(express.json())
 
 // configurando as rotas importadas dentro do app
 // chamando a função injetando uma dependência
-app.use(rotas_usuarios(usuarios_db))
+app.use(rotas_usuarios())
 
 // rota raiz
 app.get("/", (req, res) => {

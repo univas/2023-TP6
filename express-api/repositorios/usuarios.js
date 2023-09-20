@@ -1,3 +1,5 @@
+const validacaoUsuario = require('../validacoes/usuarios')
+
 // Banco de dados em memória
 let usuarios_db = [
     {
@@ -16,6 +18,8 @@ let usuarios_db = [
     }
 ]
 
+let ultimo_id = 2
+
 function transformarUsuarioParaRetorno(usuario){
     return {
         nome: usuario.nome,
@@ -25,23 +29,29 @@ function transformarUsuarioParaRetorno(usuario){
     }
 }
 
+function buscarUsuario(id){
+    // Verificar se o usuário existe
+    // filtrei todos os usuarios que atendem ao id passado  
+    const usuarios_filtrados = usuarios_db.filter(usuario => {
+        return usuario.id == id
+    })
+
+    // pegar e devolver os dados sem a senha
+    // peguei o primeiro usuario da lista
+    if(usuarios_filtrados.length == 0){
+        throw new Error(JSON.stringify({
+            status: 404
+        }))
+    }
+
+    return usuarios_filtrados[0]
+}
+
 const usuarios = () => {
     return {
-        getByid: (id) => {
-            // Verificar se o usuário existe
-            // filtrei todos os usuarios que atendem ao id passado
-            const usuarios_filtrados = usuarios_db.filter(usuario => {
-                return usuario.id == id
-            })
-
-            if(usuarios_filtrados.length == 0){
-                throw new Error(JSON.stringify({
-                    status: 404
-                }))
-            }
-            // pegar e devolver os dados sem a senha
-            // peguei o primeiro usuario da lista
-            const usuario = usuarios_filtrados[0]
+        getById: (id) => {
+            // Buscar usuário na base
+            const usuario = buscarUsuario(id)
 
             return transformarUsuarioParaRetorno(usuario)
         },
@@ -60,7 +70,7 @@ const usuarios = () => {
                     let ehValido = true
 
                     camposParaValidar.forEach(campo => {
-                        if(!usuario[campo].includes(parametros[campo])){
+                        if(!usu[campo].includes(parametros[campo])){
                             ehValido = false
                         }
                     })
@@ -73,15 +83,51 @@ const usuarios = () => {
             return usuarios_filtrados
         },
         create: (dados) => {
+            // Pego o último id inserido
+            // Já tenho o último id sendo controlado por uma variável
+            // Criar um usuário com os dados enviados
+            const usuario_novo = dados
 
+            // Validar o usuário criado
+            validacaoUsuario(usuario_novo)
+
+            // Atribuir um id 
+            usuario_novo.id = ++ultimo_id
+
+            // Salvar no banco de dados
+            usuarios_db.push(usuario_novo)
+
+            // retornar o usuário salvo
+            return usuario_novo
         },
         update: (dados, id) => {
+            // busca o usuário pelo ID
+            const usuario_cadastrado = buscarUsuario(id)
 
+            // Validar dados enviados
+            validacaoUsuario(dados)
+
+            // atualiza os dados do usuário buscado
+            usuario_cadastrado.email = dados.email
+            usuario_cadastrado.login = dados.login
+            usuario_cadastrado.nome = dados.nome
+            usuario_cadastrado.senha = dados.senha
+
+            return usuario_cadastrado
         },
-        delete: (id) => {
+        destroy: (id) => {
+            // Verificando se o usuário existe.
+            const usuario = buscarUsuario(id)
 
+            // cria um novo array sem o usuário que deve ser excluído
+            usuarios_db = usuarios_db.filter(u => u.id != id)
+
+            return true
         }
     }
 }
 
-module.exports = usuarios
+module.exports = {
+    usuarios,
+    buscarUsuario
+}
