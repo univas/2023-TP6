@@ -3,7 +3,7 @@ const router = express.Router()
 const validacaoUsuario = require('../validacoes/usuarios')
 
 // Criando função para criar as rotas e retornar o router
-const rotas_usuarios = (usuarios_db) => {
+const rotas_usuarios = (usuarios_repositorio) => {
     // rota de obter usuarios
     router.get("/usuarios", (req, res) => {
         // criando novo array com os usuarios sem a senha
@@ -16,39 +16,59 @@ const rotas_usuarios = (usuarios_db) => {
             }
         })
 
+        const {nome, login, email} = req.query
+
+        let usuarios_filtrados = usuarios_sem_senha
+
+        // Verificação se algum parâmetro foi enviado
+        // Caso nenhum tenha sido passado, pode ignorar o filter
+        // otimiza performance
+        if(nome || login || email){
+            usuarios_filtrados = usuarios_sem_senha.filter(usu => {
+                let ehValido = true
+
+                // Se o nome foi enviado e o nome do usuário é diferente do parâmetro, não deve retornar
+                if(nome && !usu.nome.includes(nome)){
+                    ehValido = false
+                }
+
+                if(login && usu.login != login){
+                    ehValido = false
+                }
+
+                if(email && usu.email != email){
+                    ehValido = false
+                }
+
+                return ehValido
+            })
+        }
+
         // enviando os usuarios
-        res.send(usuarios_sem_senha)
+        res.send(usuarios_filtrados)
     })
 
     // rota para obter um unico usuario pelo id
     router.get("/usuarios/:id", (req, res) => {
-        // capturei o parametro enviado na requisição
-        const id = req.params.id
+        try{
+            // capturei o parametro enviado na requisição
+            const id = req.params.id
+            const usuario = usuarios_repositorio.getById(id)
+            // enviei como resposta um objeto devolvido pelo repositório
+            res.send(usuario)
+        }catch(error){
+            // Capturei o erro enviado
+            const conteudo_erro = JSON.parse(error.message)
 
-        // filtrei todos os usuarios que atendem ao id passado
-        const usuarios_filtrados = usuarios_db.filter(usuario => {
-            return usuario.id == id
-        })
-
-        if(usuarios_filtrados.length == 0){
-            return res.status(404).send()
+            // Retornando os erros e status correto
+            return res.status(conteudo_erro.status).send()
         }
-
-        // peguei o primeiro usuario da lista
-        const usuario = usuarios_filtrados[0]
-
-        // enviei como resposta um objeto sem a senha do usuario
-        res.send({
-            nome: usuario.nome,
-            login: usuario.login,
-            email: usuario.email,
-            id: usuario.id
-        })
     })
 
     // rota para criar um usuário novo
     router.post("/usuarios", (req, res) => {
         try{
+            
             // buscar o último id criado
             const ultimo_id = usuarios_db.reduce((anterior, proximo) => {
                 if(proximo.id > anterior){
