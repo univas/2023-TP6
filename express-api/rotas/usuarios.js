@@ -6,46 +6,26 @@ const validacaoUsuario = require('../validacoes/usuarios')
 const rotas_usuarios = (usuarios_repositorio) => {
     // rota de obter usuarios
     router.get("/usuarios", (req, res) => {
-        // criando novo array com os usuarios sem a senha
-        const usuarios_sem_senha = usuarios_db.map((usuario) => {
-            return {
-                nome: usuario.nome,
-                login: usuario.login,
-                email: usuario.email,
-                id: usuario.id
-            }
-        })
-
         const {nome, login, email} = req.query
 
-        let usuarios_filtrados = usuarios_sem_senha
+        const parametros = {}
 
-        // Verificação se algum parâmetro foi enviado
-        // Caso nenhum tenha sido passado, pode ignorar o filter
-        // otimiza performance
-        if(nome || login || email){
-            usuarios_filtrados = usuarios_sem_senha.filter(usu => {
-                let ehValido = true
-
-                // Se o nome foi enviado e o nome do usuário é diferente do parâmetro, não deve retornar
-                if(nome && !usu.nome.includes(nome)){
-                    ehValido = false
-                }
-
-                if(login && usu.login != login){
-                    ehValido = false
-                }
-
-                if(email && usu.email != email){
-                    ehValido = false
-                }
-
-                return ehValido
-            })
+        if(nome){
+            parametros.nome = nome
         }
 
+        if(login){
+            parametros.login = login
+        }
+
+        if(email){
+            parametros.email = email
+        }
+
+        const usuarios = usuarios_repositorio.getAll(parametros)
+
         // enviando os usuarios
-        res.send(usuarios_filtrados)
+        res.send(usuarios)
     })
 
     // rota para obter um unico usuario pelo id
@@ -68,7 +48,7 @@ const rotas_usuarios = (usuarios_repositorio) => {
     // rota para criar um usuário novo
     router.post("/usuarios", (req, res) => {
         try{
-            
+
             // buscar o último id criado
             const ultimo_id = usuarios_db.reduce((anterior, proximo) => {
                 if(proximo.id > anterior){

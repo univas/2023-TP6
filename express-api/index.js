@@ -1,28 +1,11 @@
+require('dotenv').config()
 // Importação do Express
 const express = require("express")
 // Definição da porta
-const porta = 3124
+const porta = process.env.PORTA
 
 // importando rotas de usuários
 const rotas_usuarios = require('./rotas/usuarios')
-
-// Banco de dados em memória
-let usuarios_db = [
-    {
-        nome: "marcos",
-        login: "marcosantonio",
-        senha: "123456",
-        email: "marcosantonio@univas.edu.br",
-        id: 1
-    },
-    {
-        nome: "João da Silva",
-        login: "joaosilva",
-        senha: "654321",
-        email: "joaosilva@univas.edu.br",
-        id: 2
-    }
-]
 
 // Instanciando a aplicação
 const app = express()
