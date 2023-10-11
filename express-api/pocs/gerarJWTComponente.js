@@ -26,8 +26,7 @@ function gerarJWT(payload, secret_key){
     const conteudoPreHash = `${header}.${payload}`
 
     // geração do hash que vai assinar o token
-    signature = crypto.createHash('sha1', secret_key).update(conteudoPreHash).digest('hex')
-    console.log(signature)
+    signature = crypto.createHmac('sha1', secret_key).update(conteudoPreHash).digest('hex')
     // montagem do token com as 03 partes.
     const jwt = `${header}.${payload}.${signature}`
 
@@ -57,5 +56,5 @@ function validarToken(token, secret_key){
     }
 }
 
-validarToken(jwtGerado, "CACHORROs")
+validarToken(jwtGerado, "CACHORRO")
 
