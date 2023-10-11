@@ -17,4 +17,28 @@ Router.get('/produtos/:id', (req, res) => {
     }
 })
 
+Router.post("/produtos", (req, res) => {
+    try{
+        const dados = req.body
+
+        const produtoCriado = repositorio.create(dados)
+    
+        res.send(produtoCriado)
+    }catch(err){
+        res.status(400).send(err.message)
+    } 
+})
+
+Router.delete("/produtos/:id", (req, res) => {
+    try{
+        const {id} = req.params
+
+        repositorio.destroy(id)
+
+        res.status(204).send()
+    }catch(err){
+        res.status(400).send(err.message)
+    }
+})
+
 module.exports = Router

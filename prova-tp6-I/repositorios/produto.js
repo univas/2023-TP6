@@ -1,4 +1,4 @@
-const produtos = [
+let produtos = [
     {
         nome: "Geladeira",
         preco: 4599.99,
@@ -9,6 +9,8 @@ const produtos = [
     }
 ]
 let ultimo_id = 1
+
+const validacao = require("../validacoes/produto")
 
 const produtoRepositorio = () => {
     return {
@@ -23,10 +25,32 @@ const produtoRepositorio = () => {
             }else{
                 return produtosFiltrados[0]
             }
+        },
+        create: (dados) => {
+            if(validacao(dados)){
+                dados.id = ++ultimo_id
+
+                produtos.push(dados)
+
+                return dados
+            }else{
+                throw new Error("Dados inválidos para cadastrar.")
+            }
+        },
+        destroy: (id) => {
+            const produtos_filtrados = produtos.filter(prod => prod.id == id)
+
+            if(produtos_filtrados.length == 0){
+                throw new Error("Produto inexistente")
+            }
+
+            produtos = produtos.filter(prod => prod.id != id)
+
+            return true
         }
     }
 }
 
 module.exports = {
     produtoRepositorio
-}
+};
