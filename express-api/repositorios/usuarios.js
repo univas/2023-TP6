@@ -47,6 +47,24 @@ function buscarUsuario(id){
     return usuarios_filtrados[0]
 }
 
+function buscarUsuarioPorLoginESenha(login, senha){
+    // Verificar se o usuário existe
+    // filtrei todos os usuarios que atendem ao id passado  
+    const usuarios_filtrados = usuarios_db.filter(usuario => {
+        return usuario.login == login && usuario.senha == senha
+    })
+
+    // pegar e devolver os dados sem a senha
+    // peguei o primeiro usuario da lista
+    if(usuarios_filtrados.length == 0){
+        throw new Error(JSON.stringify({
+            status: 404
+        }))
+    }
+
+    return transformarUsuarioParaRetorno(usuarios_filtrados[0])
+}
+
 const usuarios = () => {
     return {
         getById: (id) => {
@@ -129,5 +147,6 @@ const usuarios = () => {
 
 module.exports = {
     usuarios,
-    buscarUsuario
+    buscarUsuario,
+    buscarUsuarioPorLoginESenha
 }

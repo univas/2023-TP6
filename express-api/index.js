@@ -7,6 +7,9 @@ const porta = process.env.PORTA
 // importando rotas de usuários
 const rotas_usuarios = require('./rotas/usuarios')
 
+// importando rotas de token
+const rotas_token = require('./rotas/token')
+
 // Instanciando a aplicação
 const app = express()
 
@@ -16,10 +19,16 @@ app.use(express.json())
 // configurando as rotas importadas dentro do app
 // chamando a função injetando uma dependência
 app.use(rotas_usuarios())
+app.use(rotas_token())
 
 // rota raiz
 app.get("/", (req, res) => {
     res.send("API executando...")
+})
+
+app.use((req, res, next) => {
+    console.log('Time:', Date.now())
+    next()
 })
 
 // Iniciando aplicação
