@@ -62,6 +62,16 @@ const rotas_usuarios = () => {
 
     // rota para criar um usuário novo
     router.post("/usuarios", (req, res) => {
+        /* #swagger.parameters['usuario'] = {
+            in: 'body',
+            description: 'Dados enviados para cadastrar o usuário',
+            schema: {
+                nome: 'Nome completo',
+                login: 'username',
+                email: 'email@mail.com',
+                senha: '123456'
+            }
+        } */
         try{
             const usuario_novo = usuarios_repositorio.create(req.body)
             // enviar a resposta

@@ -4,6 +4,10 @@ const express = require("express")
 // Definição da porta
 const porta = process.env.PORTA
 
+// IMportação dos arquivos do swagger
+const swaggerui = require('swagger-ui-express')
+const swaggerFile = require('./swaggerOutput.json')
+
 // importamos o componente middleware
 const registrarLogMiddleware = require('./middlewares/registrarLogMiddleware')
 
@@ -22,6 +26,9 @@ app.use(express.json())
 // inserimos o middleware dentro da aplicação
 app.use(registrarLogMiddleware)
 
+// ADicionar um middleware da biblioteca do swagger
+app.use('/docs', swaggerui.serve)
+
 // configurando as rotas importadas dentro do app
 // chamando a função injetando uma dependência
 app.use(rotas_usuarios())
@@ -36,6 +43,8 @@ app.use((req, res, next) => {
     console.log('Time:', Date.now())
     next()
 })
+
+app.get('/docs', swaggerui.setup(swaggerFile))
 
 // Iniciando aplicação
 app.listen(porta, (err) => {
