@@ -20,6 +20,28 @@ const rotas_usuarios = () => {
 
     // rota de obter usuarios
     router.get("/usuarios", (req, res) => {
+        // #swagger.tags = ['Usuarios']
+        // #swagger.summary = 'Uma breve explicação, com poucas palavras.'
+        // #swagger.description = 'Descrição mais detalhada da rota, aqui podemos inserir informações importantes, orientações, problemas, atualizações, etc'
+        /* #swagger.responses[200] = {
+            description: 'Retorno com sucesso, devolve todos os dados dos usuários.',
+            schema: [
+                {
+                    nome: 'Nome completo',
+                    login: 'username',
+                    email: 'email@mail.com'
+                }
+            ]
+        }
+            #swagger.responses[404] = {
+                description: 'Quando não existe nenhum dado'
+            }
+            #swagger.responses[400] = {
+                description: 'Quando o usuário ou cliente envia dados de forma incorreta.',
+                schema: "Mensagem de erro apontando as falhas enviadas"
+            }
+        
+        */
         const {nome, login, email} = req.query
 
         const parametros = {}
@@ -44,6 +66,7 @@ const rotas_usuarios = () => {
 
     // rota para obter um unico usuario pelo id
     router.get("/usuarios/:id", (req, res) => {
+        // #swagger.tags = ['Usuarios']
         try{
             // capturei o parametro enviado na requisição
             const id = req.params.id
@@ -62,12 +85,14 @@ const rotas_usuarios = () => {
 
     // rota para criar um usuário novo
     router.post("/usuarios", (req, res) => {
+        // #swagger.tags = ['Usuarios']
         /* #swagger.parameters['usuario'] = {
             in: 'body',
             description: 'Dados enviados para cadastrar o usuário',
+            required: true,
             schema: {
-                nome: 'Nome completo',
-                login: 'username',
+                $nome: 'Nome',
+                $login: 'username',
                 email: 'email@mail.com',
                 senha: '123456'
             }
@@ -87,6 +112,7 @@ const rotas_usuarios = () => {
 
     // rota para atualizar os dados de um usuário PUT
     router.put("/usuarios/:id", (req, res) => {
+        // #swagger.tags = ['Usuarios']
         try{
             // obtendo o parametro id enviado por meio de uma desestruturação
             const {id} = req.params
@@ -108,6 +134,7 @@ const rotas_usuarios = () => {
 
     // rota para atualizar os dados de um usuário, considerando apenas os que foram enviados
     router.patch("/usuarios/:id", (req, res) => {
+        // #swagger.tags = ['Usuarios']
         // obtendo o parametro id enviado por meio de uma desestruturação
         const {id} = req.params
 
@@ -127,6 +154,7 @@ const rotas_usuarios = () => {
 
     // rota para excluir um usuário da base DELETE
     router.delete("/usuarios/:id", (req, res) => {
+        // #swagger.tags = ['Usuarios']
         // obtendo parametro id enviado por meio de desestruturação
         const {id} = req.params
 

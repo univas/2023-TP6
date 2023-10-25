@@ -7,6 +7,7 @@ const usuario_repositorio = require("../repositorios/usuarios")
 const rotas_token = () => {
 
     router.post("/token", (req, res) => {
+        // #swagger.tags = ['Autenticação']
         try{
             const {usuario, senha} = req.body
 

@@ -1,19 +1,24 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
-    "title": "REST API",
-    "description": ""
+    "title": "API de usuários",
+    "description": "API criada durante o curso de Sistemas de Informação",
+    "version": "2.0.0"
   },
-  "host": "localhost:3000",
+  "host": "localhost:3124",
   "basePath": "/",
   "schemes": [
-    "http"
+    "http",
+    "https"
   ],
   "paths": {
     "/usuarios": {
       "get": {
-        "description": "",
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Uma breve explicação, com poucas palavras.",
+        "description": "Descrição mais detalhada da rota, aqui podemos inserir informações importantes, orientações, problemas, atualizações, etc",
         "parameters": [
           {
             "name": "nome",
@@ -33,23 +38,63 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Retorno com sucesso, devolve todos os dados dos usuários.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome completo"
+                  },
+                  "login": {
+                    "type": "string",
+                    "example": "username"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "email@mail.com"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Quando o usuário ou cliente envia dados de forma incorreta.",
+            "schema": {
+              "type": "string",
+              "example": "Mensagem de erro apontando as falhas enviadas",
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Quando não existe nenhum dado"
           }
         }
       },
       "post": {
+        "tags": [
+          "Usuarios"
+        ],
         "description": "",
         "parameters": [
           {
             "name": "usuario",
             "in": "body",
             "description": "Dados enviados para cadastrar o usuário",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "nome": {
                   "type": "string",
-                  "example": "Nome completo"
+                  "example": "Nome"
                 },
                 "login": {
                   "type": "string",
@@ -63,7 +108,11 @@
                   "type": "string",
                   "example": "123456"
                 }
-              }
+              },
+              "required": [
+                "nome",
+                "login"
+              ]
             }
           }
         ],
@@ -76,6 +125,9 @@
     },
     "/usuarios/{id}": {
       "get": {
+        "tags": [
+          "Usuarios"
+        ],
         "description": "",
         "parameters": [
           {
@@ -92,6 +144,9 @@
         }
       },
       "put": {
+        "tags": [
+          "Usuarios"
+        ],
         "description": "",
         "parameters": [
           {
@@ -108,6 +163,9 @@
         }
       },
       "patch": {
+        "tags": [
+          "Usuarios"
+        ],
         "description": "",
         "parameters": [
           {
@@ -145,6 +203,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "Usuarios"
+        ],
         "description": "",
         "parameters": [
           {
@@ -163,6 +224,9 @@
     },
     "/token": {
       "post": {
+        "tags": [
+          "Autenticação"
+        ],
         "description": "",
         "parameters": [
           {
