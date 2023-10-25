@@ -4,6 +4,9 @@ const express = require("express")
 // Definição da porta
 const porta = process.env.PORTA
 
+// importamos o componente middleware
+const registrarLogMiddleware = require('./middlewares/registrarLogMiddleware')
+
 // importando rotas de usuários
 const rotas_usuarios = require('./rotas/usuarios')
 
@@ -15,6 +18,9 @@ const app = express()
 
 // Definir que os dados enviados serão no formato json no corpo da requisição
 app.use(express.json())
+
+// inserimos o middleware dentro da aplicação
+app.use(registrarLogMiddleware)
 
 // configurando as rotas importadas dentro do app
 // chamando a função injetando uma dependência
