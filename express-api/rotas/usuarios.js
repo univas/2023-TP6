@@ -3,7 +3,7 @@ const ValidaToken = require('../middlewares/ValidaToken')
 const { buscarUsuario, usuarios } = require('../repositorios/usuarios')
 const router = express.Router()
 
-
+const controller = require('../controllers/usuarios.js')
 const usuarios_repositorio = usuarios()
 
 // Criando função para criar as rotas e retornar o router
@@ -19,96 +19,13 @@ const rotas_usuarios = () => {
     router.delete('/usuarios/:id', ValidaToken)
 
     // rota de obter usuarios
-    router.get("/usuarios", (req, res) => {
-        // #swagger.tags = ['Usuarios']
-        // #swagger.summary = 'Uma breve explicação, com poucas palavras.'
-        // #swagger.description = 'Descrição mais detalhada da rota, aqui podemos inserir informações importantes, orientações, problemas, atualizações, etc'
-        /* #swagger.responses[200] = {
-            description: 'Retorno com sucesso, devolve todos os dados dos usuários.',
-            schema: [
-                {
-                    nome: 'Nome completo',
-                    login: 'username',
-                    email: 'email@mail.com'
-                }
-            ]
-        }
-            #swagger.responses[404] = {
-                description: 'Quando não existe nenhum dado'
-            }
-            #swagger.responses[400] = {
-                description: 'Quando o usuário ou cliente envia dados de forma incorreta.',
-                schema: "Mensagem de erro apontando as falhas enviadas"
-            }
-        
-        */
-        const {nome, login, email} = req.query
-
-        const parametros = {}
-
-        if(nome){
-            parametros.nome = nome
-        }
-
-        if(login){
-            parametros.login = login
-        }
-
-        if(email){
-            parametros.email = email
-        }
-
-        const usuarios = usuarios_repositorio.getAll(parametros)
-
-        // enviando os usuarios
-        res.send(usuarios)
-    })
+    router.get("/usuarios", controller.getAll)
 
     // rota para obter um unico usuario pelo id
-    router.get("/usuarios/:id", (req, res) => {
-        // #swagger.tags = ['Usuarios']
-        try{
-            // capturei o parametro enviado na requisição
-            const id = req.params.id
-            const usuario = usuarios_repositorio.getById(id)
-            // enviei como resposta um objeto devolvido pelo repositório
-            res.send(usuario)
-        }catch(error){
-            // Capturei o erro enviado
-            console.log(error.message)
-            const conteudo_erro = JSON.parse(error.message)
-
-            // Retornando os erros e status correto
-            return res.status(conteudo_erro.status).send()
-        }
-    })
+    router.get("/usuarios/:id", controller.getById)
 
     // rota para criar um usuário novo
-    router.post("/usuarios", (req, res) => {
-        // #swagger.tags = ['Usuarios']
-        /* #swagger.parameters['usuario'] = {
-            in: 'body',
-            description: 'Dados enviados para cadastrar o usuário',
-            required: true,
-            schema: {
-                $nome: 'Nome',
-                $login: 'username',
-                email: 'email@mail.com',
-                senha: '123456'
-            }
-        } */
-        try{
-            const usuario_novo = usuarios_repositorio.create(req.body)
-            // enviar a resposta
-            res.send(usuario_novo)
-        }catch(error){
-            // Capturei o erro enviado
-            const conteudo_erro = JSON.parse(error.message)
-
-            // Retornando os erros e status correto
-            return res.status(conteudo_erro.status).send(conteudo_erro.erros)
-        }
-    })
+    router.post("/usuarios", controller.create)
 
     // rota para atualizar os dados de um usuário PUT
     router.put("/usuarios/:id", (req, res) => {
