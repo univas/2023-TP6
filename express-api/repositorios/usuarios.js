@@ -1,4 +1,5 @@
 const validacaoUsuario = require('../validacoes/usuarios')
+const Usuario = require('../models/usuario')
 
 // Banco de dados em memória
 let usuarios_db = [
@@ -29,22 +30,26 @@ function transformarUsuarioParaRetorno(usuario){
     }
 }
 
-function buscarUsuario(id){
-    // Verificar se o usuário existe
-    // filtrei todos os usuarios que atendem ao id passado  
-    const usuarios_filtrados = usuarios_db.filter(usuario => {
-        return usuario.id == id
-    })
+async function buscarUsuario(id){
+    // // Verificar se o usuário existe
+    // // filtrei todos os usuarios que atendem ao id passado  
+    // const usuarios_filtrados = usuarios_db.filter(usuario => {
+    //     return usuario.id == id
+    // })
 
-    // pegar e devolver os dados sem a senha
-    // peguei o primeiro usuario da lista
-    if(usuarios_filtrados.length == 0){
-        throw new Error(JSON.stringify({
-            status: 404
-        }))
-    }
+    // // pegar e devolver os dados sem a senha
+    // // peguei o primeiro usuario da lista
+    // if(usuarios_filtrados.length == 0){
+    //     throw new Error(JSON.stringify({
+    //         status: 404
+    //     }))
+    // }
 
-    return usuarios_filtrados[0]
+    // return usuarios_filtrados[0]
+
+    const usuario = await Usuario.findByPk(id)
+
+    return usuario
 }
 
 function buscarUsuarioPorLoginESenha(login, senha){
@@ -67,9 +72,9 @@ function buscarUsuarioPorLoginESenha(login, senha){
 
 const usuarios = () => {
     return {
-        getById: (id) => {
+        getById: async (id) => {
             // Buscar usuário na base
-            const usuario = buscarUsuario(id)
+            const usuario = await buscarUsuario(id)
 
             return transformarUsuarioParaRetorno(usuario)
         },
@@ -100,7 +105,7 @@ const usuarios = () => {
             // retorno do resultado
             return usuarios_filtrados
         },
-        create: (dados) => {
+        create: async (dados) => {
             // Pego o último id inserido
             // Já tenho o último id sendo controlado por uma variável
             // Criar um usuário com os dados enviados
@@ -113,14 +118,14 @@ const usuarios = () => {
             usuario_novo.id = ++ultimo_id
 
             // Salvar no banco de dados
-            usuarios_db.push(usuario_novo)
+            const usuarioSalvo = await Usuario.create(usuario_novo)
 
             // retornar o usuário salvo
-            return usuario_novo
+            return usuarioSalvo
         },
-        update: (dados, id) => {
+        update: async (dados, id) => {
             // busca o usuário pelo ID
-            const usuario_cadastrado = buscarUsuario(id)
+            const usuario_cadastrado = await buscarUsuario(id)
 
             // Validar dados enviados
             validacaoUsuario(dados)
@@ -133,9 +138,9 @@ const usuarios = () => {
 
             return usuario_cadastrado
         },
-        destroy: (id) => {
+        destroy: async (id) => {
             // Verificando se o usuário existe.
-            const usuario = buscarUsuario(id)
+            const usuario = await buscarUsuario(id)
 
             // cria um novo array sem o usuário que deve ser excluído
             usuarios_db = usuarios_db.filter(u => u.id != id)

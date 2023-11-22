@@ -46,25 +46,7 @@ test("Buscando Usuários com Supertest", async () => {
     expect(response.statusCode).toBe(200)
 })
 
-// Cenário para buscar um único usuário
-// test("Buscando um usuário", async () => {
-//     const resultado = await axios.get(`${urlBase}usuarios/1`)
 
-//     expect(typeof resultado.data).toBe('object')
-//     expect(resultado.data.id).toBe(1)
-//     expect(resultado.status).toBe(200)
-
-//     // opcional testar
-//     expect(resultado.data.nome).toBe("marcos")
-//     expect(resultado.data.login).toBe("marcosantonio")
-//     expect(resultado.data.email).toBe("marcosantonio@univas.edu.br")
-//     expect(resultado.data.senha).toBeUndefined()
-// })
-test("Buscando um único usuário com Supertest", async () => {
-    const response = await request(app).get("/usuarios/1", controller.getById)
-
-    expect(response.statusCode).toBe(200)
-})
 
 // Cadastrando um usuário
 // test("Cadastrando usuário", async () => {
@@ -95,4 +77,37 @@ test("Cadastrando novo usuário com Supertest", async () => {
                     .send(usuario)
 
     expect(response.statusCode).toBe(200)
+})
+
+// Cenário para buscar um único usuário
+// test("Buscando um usuário", async () => {
+//     const resultado = await axios.get(`${urlBase}usuarios/1`)
+
+//     expect(typeof resultado.data).toBe('object')
+//     expect(resultado.data.id).toBe(1)
+//     expect(resultado.status).toBe(200)
+
+//     // opcional testar
+//     expect(resultado.data.nome).toBe("marcos")
+//     expect(resultado.data.login).toBe("marcosantonio")
+//     expect(resultado.data.email).toBe("marcosantonio@univas.edu.br")
+//     expect(resultado.data.senha).toBeUndefined()
+// })
+test("Buscando um único usuário com Supertest", async () => {
+    const usuario = {
+        nome: "luiz",
+        login: "luizlogin",
+        senha: "luizsenha",
+        email: "luiz@univas.edu.br"
+    }
+
+    const responseCreate = await request(app)
+                    .post("/usuarios", controller.create)
+                    .send(usuario)
+
+    expect(responseCreate.statusCode).toBe(200)
+
+    const responseGet = await request(app).get(`/usuarios/${responseCreate.body.id}`, controller.getById)
+
+    expect(responseGet.statusCode).toBe(200)
 })

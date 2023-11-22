@@ -46,7 +46,7 @@ const UsuarioController = {
         // enviando os usuarios
         res.send(usuarios)
     },
-    create: (req, res) => {
+    create: async (req, res) => {
         // #swagger.tags = ['Usuarios']
         /* #swagger.parameters['usuario'] = {
             in: 'body',
@@ -60,7 +60,7 @@ const UsuarioController = {
             }
         } */
         try{
-            const usuario_novo = usuarios_repositorio.create(req.body)
+            const usuario_novo = await usuarios_repositorio.create(req.body)
             // enviar a resposta
             res.send(usuario_novo)
         }catch(error){
@@ -71,12 +71,12 @@ const UsuarioController = {
             return res.status(conteudo_erro.status).send(conteudo_erro.erros)
         }
     },
-    getById: (req, res) => {
+    getById: async (req, res) => {
         // #swagger.tags = ['Usuarios']
         try{
             // capturei o parametro enviado na requisição
             const id = req.params.id
-            const usuario = usuarios_repositorio.getById(id)
+            const usuario = await usuarios_repositorio.getById(id)
             // enviei como resposta um objeto devolvido pelo repositório
             res.send(usuario)
         }catch(error){

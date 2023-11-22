@@ -28,14 +28,14 @@ const rotas_usuarios = () => {
     router.post("/usuarios", controller.create)
 
     // rota para atualizar os dados de um usuário PUT
-    router.put("/usuarios/:id", (req, res) => {
+    router.put("/usuarios/:id", async (req, res) => {
         // #swagger.tags = ['Usuarios']
         try{
             // obtendo o parametro id enviado por meio de uma desestruturação
             const {id} = req.params
             
             // Solicitando ao repositorio para atualizar os dados do usuario
-            const usuario = usuarios_repositorio.update(req.body, id)
+            const usuario = await usuarios_repositorio.update(req.body, id)
 
             // retorna com sucesso
             return res.send(usuario)
@@ -50,12 +50,12 @@ const rotas_usuarios = () => {
     })
 
     // rota para atualizar os dados de um usuário, considerando apenas os que foram enviados
-    router.patch("/usuarios/:id", (req, res) => {
+    router.patch("/usuarios/:id", async (req, res) => {
         // #swagger.tags = ['Usuarios']
         // obtendo o parametro id enviado por meio de uma desestruturação
         const {id} = req.params
 
-        const usuario_cadastrado = buscarUsuario(id)
+        const usuario_cadastrado = await buscarUsuario(id)
 
         // atualiza os dados do usuário buscado
         usuario_cadastrado.email = req.body.email ?? usuario_cadastrado.email
@@ -63,20 +63,20 @@ const rotas_usuarios = () => {
         usuario_cadastrado.nome = req.body.nome ?? usuario_cadastrado.nome
         usuario_cadastrado.senha = req.body.senha ?? usuario_cadastrado.senha
 
-        const usuario = usuarios_repositorio.update(usuario_cadastrado, id)
+        const usuario = await usuarios_repositorio.update(usuario_cadastrado, id)
 
         // retorna com sucesso
         return res.send(usuario)
     })
 
     // rota para excluir um usuário da base DELETE
-    router.delete("/usuarios/:id", (req, res) => {
+    router.delete("/usuarios/:id", async (req, res) => {
         // #swagger.tags = ['Usuarios']
         // obtendo parametro id enviado por meio de desestruturação
         const {id} = req.params
 
         // Executando a exclusão do usuário
-        usuarios_repositorio.destroy(id)
+        await usuarios_repositorio.destroy(id)
 
         return res.status(200).send()
     })
