@@ -23,10 +23,6 @@ test("Teste com erro", () => {
 
 // TESTES DA API DE USUÁRIOS
 
-
-
-const axios = require("axios")
-const urlBase = "http://localhost:3124/"
 const request = require("supertest")
 const app = require("../app.js")
 const controller = require("../controllers/usuarios.js")
@@ -41,9 +37,12 @@ const controller = require("../controllers/usuarios.js")
 //     expect(Array.isArray(resultado.data)).toBe(true)
 // })
 test("Buscando Usuários com Supertest", async () => {
+
     const response = await request(app).get("/usuarios", controller.getAll)
 
+    console.log(response.body)
     expect(response.statusCode).toBe(200)
+
 })
 
 
@@ -77,6 +76,10 @@ test("Cadastrando novo usuário com Supertest", async () => {
                     .send(usuario)
 
     expect(response.statusCode).toBe(200)
+    expect(response.body.nome).toBe(usuario.nome)
+    expect(response.body.login).toBe(usuario.login)
+    expect(response.body.email).toBe(usuario.email)
+    expect(response.body.id).toBeDefined()
 })
 
 // Cenário para buscar um único usuário
@@ -106,8 +109,145 @@ test("Buscando um único usuário com Supertest", async () => {
                     .send(usuario)
 
     expect(responseCreate.statusCode).toBe(200)
+    expect(responseCreate.body.nome).toBe(usuario.nome)
+    expect(responseCreate.body.login).toBe(usuario.login)
+    expect(responseCreate.body.email).toBe(usuario.email)
+    expect(responseCreate.body.id).toBeDefined()
 
     const responseGet = await request(app).get(`/usuarios/${responseCreate.body.id}`, controller.getById)
 
     expect(responseGet.statusCode).toBe(200)
+    expect(responseGet.body.nome).toBe(usuario.nome)
+    expect(responseGet.body.login).toBe(usuario.login)
+    expect(responseGet.body.email).toBe(usuario.email)
+    expect(responseGet.body.id).toBeDefined()
+})
+
+
+test("Excluindo um usuário com Supertest", async () => {
+    const usuario = {
+        nome: "luiz",
+        login: "luizlogin",
+        senha: "luizsenha",
+        email: "luiz@univas.edu.br"
+    }
+
+    const responseCreate = await request(app)
+                    .post("/usuarios", controller.create)
+                    .send(usuario)
+
+    expect(responseCreate.statusCode).toBe(200)
+    expect(responseCreate.body.nome).toBe(usuario.nome)
+    expect(responseCreate.body.login).toBe(usuario.login)
+    expect(responseCreate.body.email).toBe(usuario.email)
+    expect(responseCreate.body.id).toBeDefined()
+
+    const responseGet = await request(app).get(`/usuarios/${responseCreate.body.id}`, controller.getById)
+
+    expect(responseGet.statusCode).toBe(200)
+    expect(responseGet.body.nome).toBe(usuario.nome)
+    expect(responseGet.body.login).toBe(usuario.login)
+    expect(responseGet.body.email).toBe(usuario.email)
+    expect(responseGet.body.id).toBeDefined()
+
+    const responseDelete = await request(app).delete(`/usuarios/${responseCreate.body.id}`, controller.remove)
+
+    expect(responseDelete.statusCode).toBe(200)
+})
+
+test("PUT - Atualizando um usuário com Supertest", async () => {
+    const usuario = {
+        nome: "luiz",
+        login: "luizlogin",
+        senha: "luizsenha",
+        email: "luiz@univas.edu.br"
+    }
+
+    const responseCreate = await request(app)
+                    .post("/usuarios", controller.create)
+                    .send(usuario)
+
+    expect(responseCreate.statusCode).toBe(200)
+    expect(responseCreate.body.nome).toBe(usuario.nome)
+    expect(responseCreate.body.login).toBe(usuario.login)
+    expect(responseCreate.body.email).toBe(usuario.email)
+    expect(responseCreate.body.id).toBeDefined()
+
+    const usuarioDadosNovos = {
+        nome: "luiz novo",
+        login: "luizloginnovo",
+        senha: "luizsenhanova",
+        email: "luiznovo@univas.edu.br"
+    }
+
+    const responsePut = await request(app)
+                        .put(`/usuarios/${responseCreate.body.id}`, controller.update)
+                        .send(usuarioDadosNovos)
+
+    expect(responsePut.statusCode).toBe(200)
+    expect(responsePut.body.nome).toBe(usuarioDadosNovos.nome)
+    expect(responsePut.body.login).toBe(usuarioDadosNovos.login)
+    expect(responsePut.body.email).toBe(usuarioDadosNovos.email)
+    expect(responsePut.body.id).toBeDefined()
+
+    const responseGet = await request(app)
+                        .get(`/usuarios/${responseCreate.body.id}`, controller.getById)
+
+    expect(responseGet.statusCode).toBe(200)
+    expect(responseGet.body.nome).toBe(usuarioDadosNovos.nome)
+    expect(responseGet.body.login).toBe(usuarioDadosNovos.login)
+    expect(responseGet.body.email).toBe(usuarioDadosNovos.email)
+    expect(responseGet.body.id).toBeDefined()
+
+    const responseDelete = await request(app).delete(`/usuarios/${responseCreate.body.id}`, controller.remove)
+
+    expect(responseDelete.statusCode).toBe(200)
+})
+
+test("PATCH - Atualizando um usuário com Supertest", async () => {
+    const usuario = {
+        nome: "luiz",
+        login: "luizlogin",
+        senha: "luizsenha",
+        email: "luiz@univas.edu.br"
+    }
+
+    const responseCreate = await request(app)
+                    .post("/usuarios", controller.create)
+                    .send(usuario)
+
+    expect(responseCreate.statusCode).toBe(200)
+    expect(responseCreate.body.nome).toBe(usuario.nome)
+    expect(responseCreate.body.login).toBe(usuario.login)
+    expect(responseCreate.body.email).toBe(usuario.email)
+    expect(responseCreate.body.id).toBeDefined()
+
+    const usuarioDadosNovos = {
+        nome: "luiznovo",
+        login: "luizloginnovo"
+    }
+
+    const responsePut = await request(app)
+                        .patch(`/usuarios/${responseCreate.body.id}`, controller.update)
+                        .send(usuarioDadosNovos)
+    console.log(responsePut.body)
+
+    expect(responsePut.statusCode).toBe(200)
+    expect(responsePut.body.nome).toBe(usuarioDadosNovos.nome)
+    expect(responsePut.body.login).toBe(usuarioDadosNovos.login)
+    expect(responsePut.body.email).toBe(usuario.email)
+    expect(responsePut.body.id).toBeDefined()
+
+    const responseGet = await request(app)
+                        .get(`/usuarios/${responseCreate.body.id}`, controller.getById)
+
+    expect(responseGet.statusCode).toBe(200)
+    expect(responseGet.body.nome).toBe(usuarioDadosNovos.nome)
+    expect(responseGet.body.login).toBe(usuarioDadosNovos.login)
+    expect(responseGet.body.email).toBe(usuario.email)
+    expect(responseGet.body.id).toBeDefined()
+
+    const responseDelete = await request(app).delete(`/usuarios/${responseCreate.body.id}`, controller.remove)
+
+    expect(responseDelete.statusCode).toBe(200)
 })

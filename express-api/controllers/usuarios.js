@@ -2,7 +2,7 @@ const { buscarUsuario, usuarios } = require('../repositorios/usuarios')
 const usuarios_repositorio = usuarios()
 
 const UsuarioController = {
-    getAll: (req, res) => {
+    getAll: async (req, res) => {
         // #swagger.tags = ['Usuarios']
         // #swagger.summary = 'Uma breve explicação, com poucas palavras.'
         // #swagger.description = 'Descrição mais detalhada da rota, aqui podemos inserir informações importantes, orientações, problemas, atualizações, etc'
@@ -41,7 +41,7 @@ const UsuarioController = {
             parametros.email = email
         }
 
-        const usuarios = usuarios_repositorio.getAll(parametros)
+        const usuarios = await usuarios_repositorio.getAll(parametros)
 
         // enviando os usuarios
         res.send(usuarios)
@@ -65,6 +65,7 @@ const UsuarioController = {
             res.send(usuario_novo)
         }catch(error){
             // Capturei o erro enviado
+            console.log(error.message)
             const conteudo_erro = JSON.parse(error.message)
 
             // Retornando os erros e status correto
@@ -81,12 +82,59 @@ const UsuarioController = {
             res.send(usuario)
         }catch(error){
             // Capturei o erro enviado
-            console.log(error.message)
             const conteudo_erro = JSON.parse(error.message)
 
             // Retornando os erros e status correto
             return res.status(conteudo_erro.status).send()
         }
+    },
+    remove: async (req, res) => {
+        // #swagger.tags = ['Usuarios']
+        // obtendo parametro id enviado por meio de desestruturação
+        const {id} = req.params
+
+        // Executando a exclusão do usuário
+        await usuarios_repositorio.destroy(id)
+
+        return res.status(200).send()
+    },
+    update: async (req, res) => {
+        // #swagger.tags = ['Usuarios']
+        try{
+            // obtendo o parametro id enviado por meio de uma desestruturação
+            const {id} = req.params
+            
+            // Solicitando ao repositorio para atualizar os dados do usuario
+            const usuario = await usuarios_repositorio.update(req.body, id)
+
+            // retorna com sucesso
+            return res.send(usuario)
+        }catch(error){
+            // Capturei o erro enviado
+            const conteudo_erro = JSON.parse(error.message)
+
+            // Retornando os erros e status correto
+            return res.status(conteudo_erro.status).send(conteudo_erro.erros)
+        }
+
+    },
+    patch: async (req, res) => {
+        // #swagger.tags = ['Usuarios']
+        // obtendo o parametro id enviado por meio de uma desestruturação
+        const {id} = req.params
+
+        const usuario_cadastrado = await buscarUsuario(id)
+
+        // atualiza os dados do usuário buscado
+        usuario_cadastrado.email = req.body.email ?? usuario_cadastrado.email
+        usuario_cadastrado.login = req.body.login ?? usuario_cadastrado.login
+        usuario_cadastrado.nome = req.body.nome ?? usuario_cadastrado.nome
+        usuario_cadastrado.senha = req.body.senha ?? usuario_cadastrado.senha
+
+        const usuario = await usuarios_repositorio.update(usuario_cadastrado, id)
+
+        // retorna com sucesso
+        return res.send(usuario)
     }
 }
 

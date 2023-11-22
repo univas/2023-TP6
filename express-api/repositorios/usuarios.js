@@ -1,26 +1,6 @@
 const validacaoUsuario = require('../validacoes/usuarios')
 const Usuario = require('../models/usuario')
 
-// Banco de dados em memória
-let usuarios_db = [
-    {
-        nome: "marcos",
-        login: "marcosantonio",
-        senha: "123456",
-        email: "marcosantonio@univas.edu.br",
-        id: 1
-    },
-    {
-        nome: "João da Silva",
-        login: "joaosilva",
-        senha: "654321",
-        email: "joaosilva@univas.edu.br",
-        id: 2
-    }
-]
-
-let ultimo_id = 2
-
 function transformarUsuarioParaRetorno(usuario){
     return {
         nome: usuario.nome,
@@ -78,10 +58,8 @@ const usuarios = () => {
 
             return transformarUsuarioParaRetorno(usuario)
         },
-        getAll: (parametros) => {
-            let usuarios_filtrados = usuarios_db
-            // transformação dos dados para esconder atributos
-            usuarios_filtrados = usuarios_db.map((usuario) => transformarUsuarioParaRetorno(usuario))
+        getAll: async (parametros) => {
+            let usuarios_filtrados = await Usuario.findAll()
 
             // filtragem pelos parâmetros se existirem
             const camposParaValidar = Object.keys(parametros)
@@ -115,7 +93,7 @@ const usuarios = () => {
             validacaoUsuario(usuario_novo)
 
             // Atribuir um id 
-            usuario_novo.id = ++ultimo_id
+            // usuario_novo.id = ++ultimo_id
 
             // Salvar no banco de dados
             const usuarioSalvo = await Usuario.create(usuario_novo)
@@ -135,15 +113,16 @@ const usuarios = () => {
             usuario_cadastrado.login = dados.login
             usuario_cadastrado.nome = dados.nome
             usuario_cadastrado.senha = dados.senha
+            usuario_cadastrado.save()
 
             return usuario_cadastrado
         },
         destroy: async (id) => {
-            // Verificando se o usuário existe.
-            const usuario = await buscarUsuario(id)
-
-            // cria um novo array sem o usuário que deve ser excluído
-            usuarios_db = usuarios_db.filter(u => u.id != id)
+            await Usuario.destroy({
+                where: {
+                    id
+                }
+            })
 
             return true
         }
